@@ -8,13 +8,13 @@ from config import (
 )
 
 
-def load_data(filepath: str = RAW_DATA_PATH) -> pd.DataFrame:
+def load_data(path: str = RAW_DATA_PATH) -> pd.DataFrame:
     """
     Load raw CSV and run basic sanity checks.
     Returns the full dataframe.
     """
-    print(f"[preprocess] Loading data from: {filepath}")
-    df = pd.read_csv(filepath)
+    print(f"[preprocess] Loading data from: {path}")
+    df = pd.read_csv(path)
 
     print(f"[preprocess] Shape: {df.shape[0]:,} rows × {df.shape[1]} columns")
 
