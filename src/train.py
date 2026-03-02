@@ -86,7 +86,7 @@ def train_xgboost(train_df, valid_df):
     model = {"booster": booster, "type": "xgboost"}
     return model, auc
 
-
+# for better fraud recall
 def train_lightgbm(train_df, valid_df):
     """
     Train a LightGBM model using its native API.
@@ -109,6 +109,7 @@ def train_lightgbm(train_df, valid_df):
         LGB_PARAMS,
         dtrain,
         valid_sets=[dtrain, dvalid],
+        num_leaves=15,
         valid_names=["train", "valid"],
         num_boost_round=LGB_MAX_ROUNDS,
         callbacks=[
