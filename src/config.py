@@ -16,7 +16,11 @@ RAW_DATA_PATH = os.path.join(DATA_DIR, "creditcard.csv")
 RANDOM_STATE = 2018
 
 #  Split sizes 
+<<<<<<< HEAD
 TEST_SIZE  = 0.25   # 20% held-out test set
+=======
+TEST_SIZE  = 0.15   # 20% held-out test set
+>>>>>>> fix/test-split
 VALID_SIZE = 0.20   # 20% of remaining for validation
 
 #  Feature definition 
