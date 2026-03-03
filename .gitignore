@@ -1,21 +1,30 @@
 # Data files - use DVC or cloud storage for these
-data/
+data/*
 *.csv
 *.json
 *.parquet
+
 # Model weights and outputs
-models/
+models/*
 *.pkl
 *.h5
 *.pt
 *.onnx
+
+# Allow DVC metadata files even in ignored folders
+!data/*.dvc
+!models/*.dvc
+!*.dvc
+
 # Python environment
 __pycache__/
 *.pyc
 .env
 venv/
 .venv/
+
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
 # VS Code settings
 .vscode/
