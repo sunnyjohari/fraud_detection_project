@@ -1,0 +1,82 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/creditcard.csv
+      hash: md5
+      md5: e90efcb83d69faf99fcab8b0255024de
+      size: 150828752
+    - path: src/preprocess.py
+      hash: md5
+      md5: 14616966b83749c1cb2d553e0ba92b7f
+      size: 3165
+    outs:
+    - path: data/processed/
+      hash: md5
+      md5: 971accbdf6af1f77c28acd241797c939.dir
+      size: 152211293
+      nfiles: 3
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/
+      hash: md5
+      md5: 971accbdf6af1f77c28acd241797c939.dir
+      size: 152211293
+      nfiles: 3
+    params:
+      params.yaml:
+        adaboost.learning_rate: 0.8
+        lightgbm.params:
+          boosting_type: gbdt
+          objective: binary
+          metric: auc
+          learning_rate: 0.05
+          num_leaves: 7
+          max_depth: 4
+          min_child_samples: 100
+          max_bin: 100
+          subsample: 0.9
+          subsample_freq: 1
+          colsample_bytree: 0.7
+          min_child_weight: 0
+          min_split_gain: 0
+          nthread: 8
+          verbose: -1
+          scale_pos_weight: 150
+        random_forest.n_estimators: 100
+        xgboost.params:
+          objective: binary:logistic
+          eta: 0.039
+          max_depth: 2
+          subsample: 0.8
+          colsample_bytree: 0.9
+          eval_metric: auc
+          random_state: 2018
+          verbosity: 0
+    outs:
+    - path: models/best_model.pkl
+      hash: md5
+      md5: 692a5de02063963d76ab39e398f3ec8e
+      size: 94610
+    - path: models/model_meta.json
+      hash: md5
+      md5: a0f598ce35536943904ff236247849fd
+      size: 466
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: models/best_model.pkl
+      hash: md5
+      md5: 692a5de02063963d76ab39e398f3ec8e
+      size: 94610
+    - path: src/evaluate.py
+      hash: md5
+      md5: 6cfdaa0d6e5e4848a26d9376e85f27e0
+      size: 8533
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 792427c044273b83300cffb1fb303c9d
+      size: 105
