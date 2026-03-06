@@ -254,3 +254,8 @@ if __name__ == "__main__":
     plot_precision_recall(model_obj, test_df)
     plot_feature_importance(model_obj, model_name)
     save_metrics(metrics, model_name)
+    # Save lightweight metrics.json for DVC
+    with open("metrics.json", "w") as f:
+        json.dump(metrics, f, indent=2)
+
+    print("[evaluate] Metrics saved → metrics.json")

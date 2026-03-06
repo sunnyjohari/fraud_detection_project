@@ -15,6 +15,7 @@ models/*
 !data/*.dvc
 !models/*.dvc
 !*.dvc
+!metrics.json
 
 # Python environment
 __pycache__/
