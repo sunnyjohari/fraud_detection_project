@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+import os
 
 from config import (
     RAW_DATA_PATH, TARGET, PREDICTORS,
@@ -94,4 +95,12 @@ if __name__ == "__main__":
     df                       = load_data()
     df                       = add_hour_feature(df)
     train_df, valid_df, test_df = split_data(df)
+
+    # Ensure output directory exists
+    os.makedirs("data/processed", exist_ok=True)
+
+    # Save splits
+    train_df.to_csv("data/processed/train.csv", index=False)
+    valid_df.to_csv("data/processed/valid.csv", index=False)
+    test_df.to_csv("data/processed/test.csv", index=False)
     print("\n[preprocess] Done. Splits ready for training.")
