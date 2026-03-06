@@ -1,0 +1,56 @@
+name: ML Pipeline — Fraud Detection
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  train-and-evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pull data with DVC
+        run: |
+          pip install dvc
+          dvc remote add -d localremote /tmp/dvc-store
+          dvc pull
+
+      - name: Run DVC pipeline
+        run: dvc repro
+
+      - name: Check model quality
+        run: |
+          python -c "
+import json
+m = json.load(open('metrics.json'))
+auc = m['auc']
+print(f'AUC: {auc}')
+assert auc > 0.95, f'AUC {auc} is below threshold 0.95 — pipeline FAILED'
+print('Quality check PASSED')
+"
+
+      - name: Post results to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const m = JSON.parse(fs.readFileSync('metrics.json'))
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "Model results: AUC " + m.auc + " | Precision " + m.precision + " | Recall " + m.recall
+            })
