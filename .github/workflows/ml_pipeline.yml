@@ -19,20 +19,20 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Pull data with DVC
         run: |
+          pip install -r requirements.txt
           pip install dvc
-          dvc pull
 
-      - name: Run DVC pipeline
+      - name: Prepare data and models
         run: |
-          pip install dvc
-          dvc repro
+          set -e
+          if ! dvc pull; then
+            echo "Cache missing — running pipeline from scratch"
+            dvc repro
+          fi
 
       - name: Check model quality
-        run:  |
+        run: |
           python - <<'EOF'
           import json
           m = json.load(open("metrics.json"))
@@ -53,5 +53,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "Model results: AUC " + m.auc + " | Precision " + m.precision + " | Recall " + m.recall
+              body: `Model results: AUC ${m.roc_auc} | Avg Precision ${m.avg_precision} | TP ${m.tp} | FN ${m.fn}`
             })
