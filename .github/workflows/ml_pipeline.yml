@@ -21,7 +21,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install dvc
+          pip install pytest dvc
+      
+      - name: Configure DVC remote credentials
+        run: |
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }}
+          dvc remote modify origin --local user ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Prepare data and models
         run: |
