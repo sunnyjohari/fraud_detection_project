@@ -24,7 +24,6 @@ jobs:
       - name: Pull data with DVC
         run: |
           pip install dvc
-          dvc remote add -d localremote /tmp/dvc-store
           dvc pull
 
       - name: Run DVC pipeline
