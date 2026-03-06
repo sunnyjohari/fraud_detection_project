@@ -27,7 +27,9 @@ jobs:
           dvc pull
 
       - name: Run DVC pipeline
-        run: dvc repro
+        run: |
+          pip install dvc
+          dvc repro
 
       - name: Check model quality
         run:  |
