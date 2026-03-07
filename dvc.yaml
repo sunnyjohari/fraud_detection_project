@@ -1,0 +1,30 @@
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/creditcard.csv
+    outs:
+      - data/processed/
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - data/processed/
+    outs:
+      - models/best_model.pkl
+      - models/model_meta.json
+    params:
+      - random_forest.n_estimators
+      - adaboost.learning_rate
+      - xgboost.params
+      - lightgbm.params
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/best_model.pkl
+    metrics:
+      - metrics.json:
+          cache: false
