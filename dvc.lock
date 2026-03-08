@@ -62,7 +62,7 @@ stages:
       size: 94610
     - path: models/model_meta.json
       hash: md5
-      md5: a0f598ce35536943904ff236247849fd
+      md5: 878cfdd3bf46e8c0ee2e9f693f575574
       size: 466
   evaluate:
     cmd: python src/evaluate.py
