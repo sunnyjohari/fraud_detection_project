@@ -1,4 +1,7 @@
 [core]
-    remote = localremote
+    remote = origin
 ['remote "localremote"']
     url = /tmp/dvc-store
+['remote "origin"']
+    url = https://dagshub.com/sunnyjohari/fraud_detection_project.dvc=
+    ssl_verify = false

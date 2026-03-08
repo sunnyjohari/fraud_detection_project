@@ -12,7 +12,6 @@ stages:
     deps:
       - data/processed/
     outs:
-      - models/best_model.pkl
       - models/model_meta.json
     params:
       - random_forest.n_estimators

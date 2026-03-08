@@ -1,0 +1,68 @@
+name: ML Pipeline — Fraud Detection
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  train-and-evaluate:
+    runs-on: ubuntu-latest
+    permissions:   # 👈 Add this block so the job can write PR comments
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest dvc
+      
+      - name: Configure DVC remote credentials
+        run: |
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }}
+          dvc remote modify origin --local password ${{ secrets.DAGSHUB_TOKEN }}
+
+      - name: Pull data and cached outputa
+        run: dvc pull
+      
+      - name: Run DVC pipeline
+        run: dvc repro
+
+      - name: Run all tests
+        run: pytest tests/ -v --tb=short
+
+      - name: Check model quality
+        run: |
+          python - <<'EOF'
+          import json
+          m = json.load(open("metrics.json"))
+          auc = m["roc_auc"]
+          print(f"AUC: {auc}")
+          assert auc > 0.95, f"AUC {auc} is below threshold 0.95 — pipeline FAILED"
+          print("Quality check PASSED")
+          EOF
+
+      - name: Post results to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const m = JSON.parse(fs.readFileSync('metrics.json'))
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Model results: AUC ${m.roc_auc} | Avg Precision ${m.avg_precision} | TP ${m.tp} | FN ${m.fn}`
+            })
