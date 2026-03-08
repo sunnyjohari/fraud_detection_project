@@ -33,7 +33,7 @@ stages:
           objective: binary
           metric: auc
           learning_rate: 0.05
-          num_leaves: 7
+          num_leaves: 15
           max_depth: 4
           min_child_samples: 100
           max_bin: 100
@@ -62,7 +62,7 @@ stages:
       size: 94610
     - path: models/model_meta.json
       hash: md5
-      md5: 878cfdd3bf46e8c0ee2e9f693f575574
+      md5: f231ec8d719bd3c39585eb31f6f57b9e
       size: 466
   evaluate:
     cmd: python src/evaluate.py
