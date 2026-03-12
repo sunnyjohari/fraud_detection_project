@@ -32,7 +32,11 @@ jobs:
 
         - name: Pull model and data with DVC
           run: |
-            dvc pull
+            set -e
+            if ! dvc pull; then
+                echo "Cache missing — running pipeline from scratch"
+                dvc repro
+            fi
 
         - name: Run all tests
           run: pytest tests/ -v --tb=short
