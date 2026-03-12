@@ -9,7 +9,7 @@ on:
 jobs:
   train-and-evaluate:
     runs-on: ubuntu-latest
-    permissions:   # 👈 Add this block so the job can write PR comments
+    permissions:   # Add this block so the job can write PR comments
       contents: read
       pull-requests: write
 

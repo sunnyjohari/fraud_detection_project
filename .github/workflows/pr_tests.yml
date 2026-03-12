@@ -45,7 +45,7 @@ jobs:
             script: |
               const fs = require('fs')
               const m = JSON.parse(fs.readFileSync('metrics.json'))
-              const icon = m.auc > 0.95 ? '
+              const icon = m.auc > 0.95 ? 
               github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
