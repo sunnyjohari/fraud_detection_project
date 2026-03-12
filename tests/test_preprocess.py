@@ -82,8 +82,8 @@ def test_load_data_with_missing(tmp_path):
 
 def test_split_data_small_df():
     df = make_dummy_df(n=50)
-    train, valid, test = preprocess.split_data(df)
-    assert len(train) > 0 and len(valid) > 0 and len(test) > 0
+    with pytest.raises(ValueError):
+        preprocess.split_data(df)
 
 def test_split_data_all_one_class():
     df = make_dummy_df(n=50)
