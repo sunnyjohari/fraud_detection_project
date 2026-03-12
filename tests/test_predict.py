@@ -1,7 +1,4 @@
-# ─────────────────────────────────────────────
-#  tests/test_predict.py
 #  Run with: pytest tests/
-# ─────────────────────────────────────────────
 
 import sys
 import os
@@ -28,7 +25,7 @@ def make_sample_df(n=10):
     )
 
 
-# ── We mock the model load so tests run without a trained model on disk ──
+# We mock the model load so tests run without a trained model on disk 
 
 class MockSklearnModel:
     def predict_proba(self, X):
