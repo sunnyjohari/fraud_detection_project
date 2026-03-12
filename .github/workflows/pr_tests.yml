@@ -39,7 +39,9 @@ jobs:
             fi
 
         - name: Run all tests
-          run: pytest tests/ -v --tb=short
+          run: |
+            export PYTHONPATH=$PWD
+            pytest tests/ -v --tb=short
 
         - name: Check AUC threshold
           run: |
