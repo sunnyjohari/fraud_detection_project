@@ -23,10 +23,15 @@ jobs:
         - name: Install dependencies
           run: pip install -r requirements.txt pytest
 
-        - name: Pull model and data with DVC
+        - name: Configure DVC remote credentials
           run: |
             pip install dvc
-            dvc remote add -d localremote /tmp/dvc-store
+            dvc remote modify origin --local auth basic
+            dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }}
+            dvc remote modify origin --local password ${{ secrets.DAGSHUB_TOKEN }}
+
+        - name: Pull model and data with DVC
+          run: |
             dvc pull
 
         - name: Run all tests
@@ -50,7 +55,7 @@ jobs:
             script: |
               const fs = require('fs')
               const m = JSON.parse(fs.readFileSync('metrics.json'))
-              const icon = m.auc > 0.95
+              const icon = m.auc > 0.95 ? 'PASS' : 'FAIL'
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
