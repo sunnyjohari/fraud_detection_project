@@ -48,7 +48,7 @@ jobs:
             python -c "
             import json
             m = json.load(open('metrics.json'))
-            auc = m['auc']
+            auc = m['roc_auc']
             print(f'AUC: {auc}')
             assert auc > 0.95, f'FAIL: AUC {auc} below 0.95'
             print('AUC gate: PASSED')
