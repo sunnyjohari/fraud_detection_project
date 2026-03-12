@@ -125,7 +125,7 @@ def train_lightgbm(train_df, valid_df):
     return model, auc
 
 
-#  Model selection + persistence
+#  Model selection + persistence 
 
 def select_best_model(results: dict):
     """
@@ -144,7 +144,7 @@ def select_best_model(results: dict):
     print(f"\n[train] ✓ Best model: {best_name}  (AUC = {best_auc:.4f})")
     return best_name, best_model, best_auc
 
-
+# save a best model
 def save_best_model(model_name: str, model_obj, auc: float):
     """
     Persist the best model to disk:

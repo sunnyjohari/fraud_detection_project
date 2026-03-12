@@ -57,6 +57,13 @@ def split_data(df: pd.DataFrame):
     -------
     train_df, valid_df, test_df  — each as a pandas DataFrame
     """
+
+    # Guard against invalid class distributions
+    if df[TARGET].nunique() < 2:
+        raise ValueError("Dataset must contain at least two classes")
+    if df[TARGET].value_counts().min() < 2:
+        raise ValueError("Not enough samples per class to stratify split")
+
     # Step 1: hold out test set
     train_val_df, test_df = train_test_split(
         df,

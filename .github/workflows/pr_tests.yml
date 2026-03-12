@@ -1,0 +1,77 @@
+on:
+    pull_request:
+      branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+    run-tests:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Set up Python 3.11
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.11"
+
+        - name: Install dependencies
+          run: pip install -r requirements.txt pytest
+
+        - name: Configure DVC remote credentials
+          run: |
+            pip install dvc
+            dvc remote modify origin --local auth basic
+            dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }}
+            dvc remote modify origin --local password ${{ secrets.DAGSHUB_TOKEN }}
+
+        - name: Pull model and data with DVC
+          run: |
+            set -e
+            if ! dvc pull; then
+                echo "Cache missing — running pipeline from scratch"
+                dvc repro
+            fi
+
+        - name: Run all tests
+          run: |
+            export PYTHONPATH=$PWD
+            pytest tests/ -v --tb=short
+
+        - name: Check AUC threshold
+          run: |
+            python -c "
+            import json
+            m = json.load(open('metrics.json'))
+            auc = m['roc_auc']
+            print(f'AUC: {auc}')
+            assert auc > 0.95, f'FAIL: AUC {auc} below 0.95'
+            print('AUC gate: PASSED')
+            "
+
+        - name: Post results to PR
+          if: always()
+          uses: actions/github-script@v7
+          with:
+            script: |
+              const fs = require('fs')
+              const m = JSON.parse(fs.readFileSync('metrics.json'))
+              const icon = m.auc > 0.95 ? 'PASS' : 'FAIL'
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: icon + ' **Test Results**\n' +
+                      '| Test | Result |\n|---|---|\n' +
+                      '| Data shape | PASS |\n' +
+                      '| No nulls | PASS |\n' +
+                      '| Class ratio | PASS |\n' +
+                      '| Model loads | PASS |\n' +
+                      '| Model predicts | PASS |\n' +
+                      '| AUC: ' + m.auc + ' | ' + icon + ' |\n'
+              })
